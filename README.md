@@ -38,4 +38,4 @@ npm start
 
 ## Others
 ### Documentation
-Swagger was used to create the documentation. The URL is [Documentation link]({base-url-coming-soon}/documentation)
+Swagger was used to create the documentation. The URL is [Documentation link](http://54.78.250.109:5555/documentation)
