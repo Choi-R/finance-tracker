@@ -19,7 +19,8 @@ const trackerQuery = `CREATE TABLE IF NOT EXISTS public.trackers (
 )`
 
 const alterQuery = `ALTER TABLE IF EXISTS public.trackers
-ADD UNIQUE(day, month, year, created_by)`
+ADD UNIQUE(day, month, year, created_by),
+ADD COLUMN IF NOT EXISTS unit VARCHAR`
 
 const execute = async () => {
     try { await pool.query(userQuery) }

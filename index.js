@@ -2,8 +2,10 @@ require('dotenv').config()
 require('./app/db/config')
 const express = require('express')
 const app = express()
-
 app.use(express.json())
+
+const cors = require('cors')
+app.use(cors())
 
 const swagger = require('swagger-ui-express')
 const documentation = require('./app/swagger.json')
