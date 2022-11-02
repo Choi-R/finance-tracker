@@ -1,19 +1,25 @@
 {
-  "name": "ls",
+  "name": "finance-tracker",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Choi-R/finance-planner.git"
+    "start": "node index",
+    "test": "jest  --coverage --detectOpenHandles --forceExit",
+    "create-table": "node ./app/db/modelCreate"
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Choi-R/finance-planner/issues"
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jest": "^29.2.2",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.8.0",
+    "supertest": "^6.3.1",
+    "swagger-ui-express": "^4.5.0"
   },
-  "homepage": "https://github.com/Choi-R/finance-planner#readme"
+  "devDependencies": {}
 }

@@ -1,0 +1,180 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "My Finance Tracker",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:5555"
+      }
+    ],
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer"
+        }
+      }
+    },
+    "security": [
+      {
+        "bearerAuth": []
+      }
+    ],
+    "tags": [
+      {
+        "name": "User"
+      },
+      {
+        "name": "Tracker"
+      }
+    ],
+    "paths": {
+      "/user": {
+        "post": {
+          "tags": [
+            "User"
+          ],
+          "summary": "Register",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "name": "Choi",
+                    "email": "rahmadityac@gmail.com",
+                    "password": "12345678"
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            }
+          }
+        },
+        "get": {
+          "tags": [
+            "User"
+          ],
+          "summary": "Profile",
+          "parameters": [
+            {
+              "name": "Authorization",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "example": "aaaaaa"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            }
+          }
+        }
+      },
+      "/login": {
+        "put": {
+          "tags": [
+            "User"
+          ],
+          "summary": "Login",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "email": "rahmadityac@gmail.com",
+                    "password": "12345678"
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            }
+          }
+        }
+      },
+      "/tracker": {
+        "post": {
+          "tags": [
+            "Tracker"
+          ],
+          "summary": "Input Data",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "day": 1,
+                    "month": 1,
+                    "year": 2022,
+                    "total": 50000
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            }
+          }
+        },
+        "get": {
+          "tags": [
+            "Tracker"
+          ],
+          "summary": "List Data",
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            }
+          }
+        },
+        "put": {
+          "tags": [
+            "Tracker"
+          ],
+          "summary": "Edit Data",
+          "requestBody": {
+            "content": {}
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
