@@ -4,11 +4,10 @@ const jwt = require(`jsonwebtoken`)
 const { success, error, errorBug } = require('../helpers/response')
 
 exports.register = async (req, res) => {
-    const { name, email, password } = req.body
+    const { name, email, hashedPassword } = req.body;
     try {
-        if (!name || !email || !password) { throw "missing" }
-        let hashedPassword = bcrypt.hashSync(password, 10);
-        let { rows } = await pool.query(`INSERT INTO public.users (name, email, password, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING *`, [name, email, hashedPassword, new Date()])
+        let { rows } = await pool.query(`INSERT INTO public.users (name, email, password, created_at) 
+        VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING *`, [name, email, hashedPassword, new Date()])
 
         if (rows[0]) {
             let token = jwt.sign(rows[0].id, process.env.SECRET_KEY)
@@ -17,13 +16,7 @@ exports.register = async (req, res) => {
         else { throw "This email is already exist" }
     }
     catch (err) {
-        if (typeof err == 'string') { 
-            if (err == 'missing') {
-                if (!name) { return error(res, 400, "name is missing") }
-                if (!email) { return error(res, 400, "email is missing") }
-                if (!password) { return error(res, 400, "password is missing") }
-            }
-        }
+        if (typeof err == 'string' && err.includes('already exist')) { return error(res, 400, err) }
         else { return errorBug(res, err, `From register user`) }
     }
 }

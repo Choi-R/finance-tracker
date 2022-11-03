@@ -4,7 +4,7 @@ const { error, errorBug } = require('../helpers/response')
 exports.authenticate = async (req, res, next) => {
     let { authorization } = req.headers
     try {
-        if (authorization.includes('Bearer')) authorization = authorization.substring(7)
+        if ( authorization && authorization.includes('Bearer')) authorization = authorization.substring(7)
         let data = jwt.verify(authorization, process.env.SECRET_KEY)
         if (data) {
             req.user = { id: data }
