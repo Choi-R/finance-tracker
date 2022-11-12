@@ -5,14 +5,12 @@ exports.insertData = async (req, res) => {
     const { day, month, year, total } = req.body
     const { id } = req.user
     try {
-        let { rows } = await pool.query(`INSERT INTO public.trackers (day, month, year, total, created_by, created_at) 
-        VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING RETURNING *`, [day, month, year, total, id, new Date()])
+        let { rows } = await pool.query(`INSERT INTO public.trackers (day, month, year, total, created_by, created_at, total_with_unit) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT DO NOTHING RETURNING *`, [day, month, year, total, id, new Date(), {PLN: total}])
 
-        if (rows[0]) {
-            let token = jwt.sign(rows[0].id, process.env.SECRET_KEY)
-            return success(res, 201, token)
-        }
-        else { throw "This date is already exist" }
+        if (!rows[0]) { throw "This date is already exist" }
+
+        return success(res, 201, rows[0])
     }
     catch (err) {
         if (typeof err == 'string' && err.includes('already exist')) { return error(res, 400, err) }
@@ -23,9 +21,9 @@ exports.insertData = async (req, res) => {
 exports.listData = async (req, res) => {
     const { id } = req.user
     try {
-        let { rows } = await pool.query(`SELECT id, month, year, SUM(total) AS total FROM public.trackers
+        let { rows } = await pool.query(`SELECT month, year, SUM(total) AS total FROM public.trackers
         WHERE created_by=$1 
-        GROUP BY month
+        GROUP BY month, year
         ORDER BY year DESC, month DESC`, [id])
         return success(res, 200, rows)
     }

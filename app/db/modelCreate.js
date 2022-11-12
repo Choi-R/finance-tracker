@@ -20,7 +20,8 @@ const trackerQuery = `CREATE TABLE IF NOT EXISTS public.trackers (
 
 const alterQuery = `ALTER TABLE IF EXISTS public.trackers
 ADD UNIQUE(day, month, year, created_by),
-ADD COLUMN IF NOT EXISTS unit VARCHAR`
+ADD COLUMN IF NOT EXISTS total_with_unit JSONB,
+ALTER COLUMN total TYPE FLOAT8`
 
 const execute = async () => {
     try { await pool.query(userQuery) }
