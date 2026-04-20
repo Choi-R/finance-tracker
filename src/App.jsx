@@ -130,10 +130,10 @@ export default function App() {
   };
 
   const recentDaysStats = useMemo(() => {
-    // Generate an array of exactly the last 15 days
-    const exactLast15Days = Array.from({ length: 15 }, (_, i) => format(subDays(new Date(), i), 'yyyy-MM-dd'));
+    // Generate an array of exactly the last 7 days
+    const exactLast7Days = Array.from({ length: 7 }, (_, i) => format(subDays(new Date(), i), 'yyyy-MM-dd'));
     
-    return exactLast15Days.map(date => {
+    return exactLast7Days.map(date => {
       const dayEntries = periodEntries.filter(e => e.date === date);
       const dailyTotal = dayEntries.filter(e => e.category === 'daily').reduce((sum, e) => sum + e.amount, 0);
       const lainTotal = dayEntries.filter(e => e.category === 'lain-lain').reduce((sum, e) => sum + e.amount, 0);
@@ -615,7 +615,7 @@ export default function App() {
             {/* History Section */}
             <div className="history-section">
               <div className="history-header">
-                <h2>Ringkasan 15 Hari Terakhir</h2>
+                <h2>Ringkasan 7 Hari Terakhir</h2>
               </div>
               
               {recentDaysStats.length === 0 ? (
