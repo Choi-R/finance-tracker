@@ -2,7 +2,7 @@
 
 This is my mini weekend project: a Personal Finance Tracker. I already track my expenses using Google Sheets, but I wanted something faster and more convenient to use on my phone. So I decided to build this app to make it easier and accessible. It calculates budget limits per period, groups transactions, and gives a compact 15-day aggregate summary of my recent spendings directly on the dashboard.
 
-I applied a **Stale-While-Revalidate (SWR)** caching pattern with `localStorage` too, so the app basically has a zero-second time-to-interactive. And yeah, I threw in a simple Passkey Vault Auth in the front.
+I applied a **Stale-While-Revalidate (SWR)** caching pattern with `localStorage` too, so the app basically has a zero-second time-to-interactive. Also threw in a simple Passkey Vault Auth in the front.
 
 ## 🛠 Tech Stacks
 
@@ -17,7 +17,7 @@ I applied a **Stale-While-Revalidate (SWR)** caching pattern with `localStorage`
 *   Protected by a single passkey stored with an expiry token. Basic concept but works perfectly to prevent unauthorized access.
 *   Tracks budget remaining per monthly cycle individually.
 *   A heavily condensed tabular view grouping up transactions for straightforward auditing.
-*   Basically, for personal use, it's fast, free, neat, and secure. Does its job perfectly.
+*   In short, for personal use: it's fast, free, neat, and secure. Does its job perfectly.
 
 ## 🏃‍♂️ How to Run
 
