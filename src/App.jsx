@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { format, isWithinInterval, addMonths, subMonths, subDays } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Settings, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Settings, Plus, Trash2, Calendar } from 'lucide-react';
 import { CATEGORIES, getPeriodForDate, getPeriodByKey, formatCurrency } from './utils';
 import { fetchSheetData, addEntryToSheet, deleteEntryFromSheet, updateBudgetInSheet } from './api';
 import { getValidKey, saveKey, clearKey } from './auth';
@@ -46,6 +46,9 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [detailListMode, setDetailListMode] = useState('grouped'); // 'individual' or 'grouped'
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const detailDateRef = useRef(null);
+  const formDateRef = useRef(null);
 
   // Form State
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -371,14 +374,37 @@ export default function App() {
           </button>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
             Pengeluaran 
-            <input 
-              type="date" 
-              className="glass-input custom-date-input" 
-              style={{ width: '13rem', padding: '0.3rem 0.5rem', fontSize: '1.1rem', fontWeight: 700 }}
-              value={selectedDate} 
-              data-date={selectedDate ? format(new Date(selectedDate), 'dd MMMM yyyy', { locale: id }) : ''}
-              onChange={e => setSelectedDate(e.target.value)}
-            />
+            <div style={{ position: 'relative', display: 'inline-block' }} onClick={() => detailDateRef.current?.showPicker()}>
+              <div className="glass-input" style={{ width: '14rem', padding: '0.3rem 0.5rem', fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: 0, cursor: 'pointer' }}>
+                <span>{selectedDate ? format(new Date(selectedDate), 'dd MMMM yyyy', { locale: id }) : 'Pilih Tanggal'}</span>
+                <Calendar size={18} style={{ opacity: 0.7 }} />
+              </div>
+              <input 
+                ref={detailDateRef}
+                type="date" 
+                value={selectedDate} 
+                onChange={e => {
+                  if (!e.target.value) {
+                    setSelectedDate(format(new Date(), 'yyyy-MM-dd'));
+                  } else {
+                    setSelectedDate(e.target.value);
+                  }
+                }}
+                style={{ 
+                  position: 'absolute', 
+                  top: 0, 
+                  left: 0, 
+                  width: '100%', 
+                  height: '100%', 
+                  opacity: 0,
+                  WebkitAppearance: 'none',
+                  appearance: 'none',
+                  color: 'transparent',
+                  background: 'transparent',
+                  pointerEvents: 'none'
+                }}
+              />
+            </div>
           </h2>
         </div>
 
@@ -570,14 +596,32 @@ export default function App() {
               <form className="entry-form" onSubmit={handleAddEntry}>
                 <div className="form-group">
                   <label>Tanggal</label>
-                  <input 
-                    type="date" 
-                    className="glass-input custom-date-input" 
-                    value={date} 
-                    data-date={date ? format(new Date(date), 'dd/MM/yyyy') : ''}
-                    onChange={e => setDate(e.target.value)}
-                    required
-                  />
+                  <div style={{ position: 'relative' }} onClick={() => formDateRef.current?.showPicker()}>
+                    <div className="glass-input" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                      <span>{date ? format(new Date(date), 'dd/MM/yyyy') : 'DD/MM/YYYY'}</span>
+                      <Calendar size={18} style={{ opacity: 0.7 }} />
+                    </div>
+                    <input 
+                      ref={formDateRef}
+                      type="date" 
+                      value={date} 
+                      onChange={e => setDate(e.target.value)}
+                      required
+                style={{ 
+                  position: 'absolute', 
+                  top: 0, 
+                  left: 0, 
+                  width: '100%', 
+                  height: '100%', 
+                  opacity: 0,
+                  WebkitAppearance: 'none',
+                  appearance: 'none',
+                  color: 'transparent',
+                  background: 'transparent',
+                  pointerEvents: 'none'
+                }}
+                    />
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Kategori</label>
