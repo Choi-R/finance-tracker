@@ -169,12 +169,20 @@ export default function App() {
     e.preventDefault();
     if (!amount || isNaN(amount)) return;
 
+    // Secure sanitization
+    // 1. Strip raw HTML tags to prevent general XSS
+    let sanitizedNote = note.replace(/<[^>]*>?/gm, '').trim();
+    // 2. Prevent Google Sheets formula injection (=, +, -, @)
+    if (/^[=+\-@]/.test(sanitizedNote)) {
+      sanitizedNote = "'" + sanitizedNote;
+    }
+
     const newEntry = {
       id: uuidv4(),
       date,
       category,
       amount: Number(amount),
-      note
+      note: sanitizedNote
     };
 
     // Optimistic Update
