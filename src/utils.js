@@ -22,13 +22,14 @@ export const getPeriodForDate = (dateObj) => {
     start,
     end,
     // Month name based on the baseMonth (which is the month of the 10th)
-    monthKey: format(baseMonth, 'yyyy-MM'),
+    monthKey: `PRD-${format(baseMonth, 'yyyy-MM')}`,
     label: `${format(start, 'dd MMMM yyyy', { locale: id })} - ${format(end, 'dd MMMM yyyy', { locale: id })}`
   };
 };
 
 export const getPeriodByKey = (monthKeyStr) => {
-  const [year, month] = monthKeyStr.split('-').map(Number);
+  const str = monthKeyStr.startsWith('PRD-') ? monthKeyStr.slice(4) : monthKeyStr;
+  const [year, month] = str.split('-').map(Number);
   const baseMonth = new Date(year, month - 1, 10);
   
   const start = setDate(baseMonth, 10);

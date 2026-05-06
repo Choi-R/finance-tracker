@@ -46,9 +46,26 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [detailListMode, setDetailListMode] = useState('grouped'); // 'individual' or 'grouped'
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [draftBudgets, setDraftBudgets] = useState({});
 
   const detailDateRef = useRef(null);
   const formDateRef = useRef(null);
+
+  useEffect(() => {
+    if (isSettingsOpen) {
+      setDraftBudgets(currentPeriodBudgets);
+    }
+  }, [isSettingsOpen, currentPeriodBudgets]);
+
+  const handleSaveBudgets = async () => {
+    setIsSettingsOpen(false);
+    for (const cat of CATEGORIES) {
+      const val = Number(draftBudgets[cat.id] || 0);
+      if (val !== currentPeriodBudgets[cat.id]) {
+        await updateBudget(cat.id, val);
+      }
+    }
+  };
 
   // Form State
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -157,15 +174,17 @@ export default function App() {
   }, [periodEntries]);
 
   const prevPeriod = () => {
-    const [y, m] = currentPeriodKey.split('-').map(Number);
+    const keyStr = currentPeriodKey.replace('PRD-', '');
+    const [y, m] = keyStr.split('-').map(Number);
     const newDate = subMonths(new Date(y, m - 1, 10), 1);
-    setCurrentPeriodKey(format(newDate, 'yyyy-MM'));
+    setCurrentPeriodKey(`PRD-${format(newDate, 'yyyy-MM')}`);
   };
 
   const nextPeriod = () => {
-    const [y, m] = currentPeriodKey.split('-').map(Number);
+    const keyStr = currentPeriodKey.replace('PRD-', '');
+    const [y, m] = keyStr.split('-').map(Number);
     const newDate = addMonths(new Date(y, m - 1, 10), 1);
-    setCurrentPeriodKey(format(newDate, 'yyyy-MM'));
+    setCurrentPeriodKey(`PRD-${format(newDate, 'yyyy-MM')}`);
   };
 
   const handleAddEntry = async (e) => {
@@ -732,14 +751,14 @@ export default function App() {
                 <input 
                   type="number" 
                   className="glass-input" 
-                  value={currentPeriodBudgets[cat.id]}
-                  onChange={e => updateBudget(cat.id, Number(e.target.value))}
+                  value={draftBudgets[cat.id] ?? ''}
+                  onChange={e => setDraftBudgets(prev => ({ ...prev, [cat.id]: e.target.value }))}
                 />
               </div>
             ))}
           </div>
           <div className="modal-footer">
-            <button className="glass-button" onClick={() => setIsSettingsOpen(false)}>
+            <button className="glass-button" onClick={handleSaveBudgets}>
               Simpan Pengaturan
             </button>
           </div>
