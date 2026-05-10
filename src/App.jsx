@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { format, isWithinInterval, addMonths, subMonths, subDays } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Settings, Plus, Trash2, Calendar } from 'lucide-react';
-import { CATEGORIES, getPeriodForDate, getPeriodByKey, formatCurrency } from './utils';
+import { CATEGORIES, getPeriodForDate, getPeriodByKey, formatCurrency, parseLocalDate } from './utils';
 import { fetchSheetData, addEntryToSheet, deleteEntryFromSheet, updateBudgetInSheet } from './api';
 import { getValidKey, saveKey, clearKey } from './auth';
 import './index.css';
@@ -113,12 +113,12 @@ export default function App() {
   // Filter entries for the current period
   const periodEntries = useMemo(() => {
     return entries.filter(entry => {
-      const entryDate = new Date(entry.date);
+      const entryDate = parseLocalDate(entry.date);
       // set entryDate to start of day to avoid time issues? The interval checks exact Date.
       // it's safer to just check boundaries: >= start and <= end
       // but date-fns isWithinInterval handles it well if we ensure correct types
       return entryDate >= currentPeriod.start && entryDate <= currentPeriod.end;
-    }).sort((a, b) => new Date(b.date) - new Date(a.date));
+    }).sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
   }, [entries, currentPeriod]);
 
   // Compute Grand totals & category stats
@@ -233,7 +233,7 @@ export default function App() {
       if (!success) {
         alert("Gagal menghapus dari database! Perubahan dibatalkan.");
         // Ensure to keep sequence sorted by date
-        setEntries(prev => [...prev, entryToRestore].sort((a, b) => new Date(b.date) - new Date(a.date)));
+        setEntries(prev => [...prev, entryToRestore].sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date)));
       }
       setIsSyncing(false);
     }
@@ -279,7 +279,7 @@ export default function App() {
       }
       return acc;
     }, {});
-    const groupedEntries = Object.values(groupedEntriesObj).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const groupedEntries = Object.values(groupedEntriesObj).sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
 
     return (
       <div className="category-detail-view" style={{ animation: 'fadeIn 0.3s ease' }}>
@@ -341,7 +341,7 @@ export default function App() {
                       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                         <span className={`hi-category ${cat.badgeClass}`}>{cat.label}</span>
                         <span className="hi-date clickable-date" title="Lihat semua pengeluaran hari ini" onClick={() => setSelectedDate(entry.date)}>
-                          {format(new Date(entry.date), 'dd MMMM', { locale: id })}
+                          {format(parseLocalDate(entry.date), 'dd MMMM', { locale: id })}
                         </span>
                       </div>
                       <div className="hi-note">{entry.note}</div>
@@ -361,7 +361,7 @@ export default function App() {
                       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                         <span className={`hi-category ${cat.badgeClass}`}>{cat.label}</span>
                         <span className="hi-date clickable-date" title="Lihat semua pengeluaran hari ini" onClick={() => setSelectedDate(group.date)}>
-                          {format(new Date(group.date), 'dd MMMM', { locale: id })}
+                          {format(parseLocalDate(group.date), 'dd MMMM', { locale: id })}
                         </span>
                       </div>
                       <div className="hi-note">{group.notes.join(', ')}</div>
@@ -395,7 +395,7 @@ export default function App() {
             Pengeluaran 
             <div style={{ position: 'relative', display: 'inline-block' }} onClick={() => detailDateRef.current?.showPicker()}>
               <div className="glass-input" style={{ width: '14rem', padding: '0.3rem 0.5rem', fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: 0, cursor: 'pointer' }}>
-                <span>{selectedDate ? format(new Date(selectedDate), 'dd MMMM yyyy', { locale: id }) : 'Pilih Tanggal'}</span>
+                <span>{selectedDate ? format(parseLocalDate(selectedDate), 'dd MMMM yyyy', { locale: id }) : 'Pilih Tanggal'}</span>
                 <Calendar size={18} style={{ opacity: 0.7 }} />
               </div>
               <input 
@@ -452,7 +452,7 @@ export default function App() {
                     <div className="hi-left">
                       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                         <span className={`hi-category ${catObj.badgeClass}`}>{catObj.label}</span>
-                        <span className="hi-date clickable-date" title="Per Hari" onClick={() => setSelectedDate(entry.date)}>{format(new Date(entry.date), 'dd MMMM', { locale: id })}</span>
+                        <span className="hi-date clickable-date" title="Per Hari" onClick={() => setSelectedDate(entry.date)}>{format(parseLocalDate(entry.date), 'dd MMMM', { locale: id })}</span>
                       </div>
                       <div className="hi-note">{entry.note}</div>
                     </div>
@@ -617,7 +617,7 @@ export default function App() {
                   <label>Tanggal</label>
                   <div style={{ position: 'relative' }} onClick={() => formDateRef.current?.showPicker()}>
                     <div className="glass-input" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-                      <span>{date ? format(new Date(date), 'dd/MM/yyyy') : 'DD/MM/YYYY'}</span>
+                      <span>{date ? format(parseLocalDate(date), 'dd/MM/yyyy') : 'DD/MM/YYYY'}</span>
                       <Calendar size={18} style={{ opacity: 0.7 }} />
                     </div>
                     <input 
@@ -719,7 +719,7 @@ export default function App() {
                         alignItems: 'center' 
                       }}
                     >
-                      <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{format(new Date(stat.date), 'dd MMM', { locale: id })}</div>
+                      <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{format(parseLocalDate(stat.date), 'dd MMM', { locale: id })}</div>
                       <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.dailyTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.dailyTotal)}</div>
                       <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.lainTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.lainTotal)}</div>
                       <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.tagihanTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.tagihanTotal)}</div>

@@ -9,6 +9,13 @@ export const CATEGORIES = [
   { id: 'jajan-istri', label: 'Jajan Istri', badgeClass: 'cat-badge-jajan-istri', colorClass: 'cat-jajan-istri' }
 ];
 
+// Helper to reliably parse 'YYYY-MM-DD' as local time without timezone shifts
+export const parseLocalDate = (dateStr) => {
+  if (!dateStr) return new Date();
+  const [y, m, d] = dateStr.split('-');
+  return new Date(y, m - 1, d);
+};
+
 // Calculate period based on the 10th of the month cutoff
 export const getPeriodForDate = (dateObj) => {
   const day = dateObj.getDate();
@@ -16,7 +23,9 @@ export const getPeriodForDate = (dateObj) => {
   const baseMonth = day < 10 ? subMonths(dateObj, 1) : dateObj;
   
   const start = setDate(baseMonth, 10);
+  start.setHours(0, 0, 0, 0);
   const end = setDate(addMonths(baseMonth, 1), 9);
+  end.setHours(23, 59, 59, 999);
   
   return {
     start,
@@ -33,7 +42,9 @@ export const getPeriodByKey = (monthKeyStr) => {
   const baseMonth = new Date(year, month - 1, 10);
   
   const start = setDate(baseMonth, 10);
+  start.setHours(0, 0, 0, 0);
   const end = setDate(addMonths(baseMonth, 1), 9);
+  end.setHours(23, 59, 59, 999);
   
   return {
     start,
