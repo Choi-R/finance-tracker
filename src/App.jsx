@@ -45,6 +45,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [detailListMode, setDetailListMode] = useState('grouped'); // 'individual' or 'grouped'
+  const [searchQuery, setSearchQuery] = useState('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [draftBudgets, setDraftBudgets] = useState({});
 
@@ -172,6 +173,32 @@ export default function App() {
       };
     });
   }, [periodEntries]);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase();
+    const matched = entries.filter(e => e.note && e.note.toLowerCase().includes(query));
+    
+    const grouped = matched.reduce((acc, entry) => {
+      if (!acc[entry.date]) {
+         acc[entry.date] = { date: entry.date, dailyTotal: 0, lainTotal: 0, tagihanTotal: 0, notes: [], total: 0 };
+      }
+      if (entry.category === 'daily') acc[entry.date].dailyTotal += entry.amount;
+      else if (entry.category === 'lain-lain') acc[entry.date].lainTotal += entry.amount;
+      else if (entry.category === 'tagihan') acc[entry.date].tagihanTotal += entry.amount;
+      
+      acc[entry.date].total += entry.amount;
+      acc[entry.date].notes.push(entry.note);
+      return acc;
+    }, {});
+    
+    return Object.values(grouped)
+      .sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date))
+      .map(item => ({
+         ...item,
+         notes: item.notes.join(', ')
+      }));
+  }, [searchQuery, entries]);
 
   const prevPeriod = () => {
     const keyStr = currentPeriodKey.replace('PRD-', '');
@@ -382,7 +409,7 @@ export default function App() {
   const renderDateDetailView = () => {
     if (!selectedDate) return null;
     
-    const dateEntries = periodEntries.filter(e => e.date === selectedDate);
+    const dateEntries = entries.filter(e => e.date === selectedDate);
     const dateTotal = dateEntries.reduce((sum, e) => sum + e.amount, 0);
 
     return (
@@ -685,49 +712,99 @@ export default function App() {
 
             {/* History Section */}
             <div className="history-section">
-              <div className="history-header">
-                <h2>Ringkasan 7 Hari Terakhir</h2>
+              <div className="history-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <h2 style={{ margin: 0 }}>{searchQuery ? 'Hasil Pencarian' : 'Ringkasan 7 Hari Terakhir'}</h2>
+                <input 
+                  type="text" 
+                  className="glass-input" 
+                  placeholder="Cari catatan..." 
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{ width: '200px', padding: '0.4rem 0.8rem', fontSize: '0.9rem', margin: 0 }}
+                />
               </div>
               
-              {recentDaysStats.length === 0 ? (
-                <div className="empty-state">
-                  <p>Belum ada pengeluaran di periode ini.</p>
-                  <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', opacity: 0.7 }}>Yuk mulai catat pengeluaranmu dari sekarang!</p>
-                </div>
-              ) : (
-                <div className="glass-panel" style={{ padding: '0.5rem 1rem' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(45px, auto) 45px 45px 45px 45px 1fr', gap: '0.5rem', padding: '0.5rem 0 0.75rem 0', marginBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>
-                    <div>Tgl</div>
-                    <div style={{ textAlign: 'right' }}>Daily</div>
-                    <div style={{ textAlign: 'right' }}>Lain</div>
-                    <div style={{ textAlign: 'right' }}>Tagihan</div>
-                    <div style={{ textAlign: 'right', color: 'var(--text-primary)' }}>Total</div>
-                    <div style={{ marginLeft: '1rem' }}>Catatan</div>
+              {searchQuery ? (
+                searchResults.length === 0 ? (
+                  <div className="empty-state">
+                    <p>Tidak ada hasil yang cocok dengan "{searchQuery}".</p>
                   </div>
-                  
-                  {recentDaysStats.map((stat, i) => (
-                    <div 
-                      key={stat.date} 
-                      className="compact-row" 
-                      onClick={() => setSelectedDate(stat.date)}
-                      title="Lihat detail hari ini"
-                      style={{ 
-                        cursor: 'pointer',
-                        display: 'grid', gridTemplateColumns: 'minmax(45px, auto) 45px 45px 45px 45px 1fr', 
-                        gap: '0.5rem', 
-                        borderBottom: i === recentDaysStats.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.05)', 
-                        alignItems: 'center' 
-                      }}
-                    >
-                      <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{format(parseLocalDate(stat.date), 'dd MMM', { locale: id })}</div>
-                      <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.dailyTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.dailyTotal)}</div>
-                      <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.lainTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.lainTotal)}</div>
-                      <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.tagihanTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.tagihanTotal)}</div>
-                      <div style={{ textAlign: 'right', fontSize: '0.85rem', fontWeight: 700, color: stat.total === 0 ? 'var(--text-secondary)' : 'var(--accent, #6366f1)' }}>{formatCompact(stat.total)}</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginLeft: '1rem' }}>{stat.notes || '-'}</div>
+                ) : (
+                  <div className="glass-panel" style={{ padding: '0.5rem 1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(45px, auto) 45px 45px 45px 45px 1fr', gap: '0.5rem', padding: '0.5rem 0 0.75rem 0', marginBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>
+                      <div>Tgl</div>
+                      <div style={{ textAlign: 'right' }}>Daily</div>
+                      <div style={{ textAlign: 'right' }}>Lain</div>
+                      <div style={{ textAlign: 'right' }}>Tagihan</div>
+                      <div style={{ textAlign: 'right', color: 'var(--text-primary)' }}>Total</div>
+                      <div style={{ marginLeft: '1rem' }}>Catatan</div>
                     </div>
-                  ))}
-                </div>
+                    
+                    {searchResults.map((stat, i) => (
+                      <div 
+                        key={stat.date} 
+                        className="compact-row" 
+                        onClick={() => setSelectedDate(stat.date)}
+                        title="Lihat detail hari ini"
+                        style={{ 
+                          cursor: 'pointer',
+                          display: 'grid', gridTemplateColumns: 'minmax(45px, auto) 45px 45px 45px 45px 1fr', 
+                          gap: '0.5rem', 
+                          borderBottom: i === searchResults.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.05)', 
+                          alignItems: 'center' 
+                        }}
+                      >
+                        <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{format(parseLocalDate(stat.date), 'dd MMM', { locale: id })}</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.dailyTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.dailyTotal)}</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.lainTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.lainTotal)}</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.tagihanTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.tagihanTotal)}</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', fontWeight: 700, color: stat.total === 0 ? 'var(--text-secondary)' : 'var(--accent, #6366f1)' }}>{formatCompact(stat.total)}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginLeft: '1rem' }}>{stat.notes || '-'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              ) : (
+                recentDaysStats.length === 0 ? (
+                  <div className="empty-state">
+                    <p>Belum ada pengeluaran di periode ini.</p>
+                    <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', opacity: 0.7 }}>Yuk mulai catat pengeluaranmu dari sekarang!</p>
+                  </div>
+                ) : (
+                  <div className="glass-panel" style={{ padding: '0.5rem 1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(45px, auto) 45px 45px 45px 45px 1fr', gap: '0.5rem', padding: '0.5rem 0 0.75rem 0', marginBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>
+                      <div>Tgl</div>
+                      <div style={{ textAlign: 'right' }}>Daily</div>
+                      <div style={{ textAlign: 'right' }}>Lain</div>
+                      <div style={{ textAlign: 'right' }}>Tagihan</div>
+                      <div style={{ textAlign: 'right', color: 'var(--text-primary)' }}>Total</div>
+                      <div style={{ marginLeft: '1rem' }}>Catatan</div>
+                    </div>
+                    
+                    {recentDaysStats.map((stat, i) => (
+                      <div 
+                        key={stat.date} 
+                        className="compact-row" 
+                        onClick={() => setSelectedDate(stat.date)}
+                        title="Lihat detail hari ini"
+                        style={{ 
+                          cursor: 'pointer',
+                          display: 'grid', gridTemplateColumns: 'minmax(45px, auto) 45px 45px 45px 45px 1fr', 
+                          gap: '0.5rem', 
+                          borderBottom: i === recentDaysStats.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.05)', 
+                          alignItems: 'center' 
+                        }}
+                      >
+                        <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{format(parseLocalDate(stat.date), 'dd MMM', { locale: id })}</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.dailyTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.dailyTotal)}</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.lainTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.lainTotal)}</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.tagihanTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.tagihanTotal)}</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', fontWeight: 700, color: stat.total === 0 ? 'var(--text-secondary)' : 'var(--accent, #6366f1)' }}>{formatCompact(stat.total)}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginLeft: '1rem' }}>{stat.notes || '-'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )
               )}
             </div>
           </div>
