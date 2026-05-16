@@ -7,7 +7,17 @@ import { getValidKey, clearKey } from './auth';
  * Helper to perform POST requests. We send payload as text/plain 
  * to avoid CORS preflight issues with Google Apps Script.
  */
+let lastPostTime = 0;
+const RATE_LIMIT_MS = 1000; // 1 second client-side throttle
+
 async function postData(payload) {
+  const now = Date.now();
+  if (now - lastPostTime < RATE_LIMIT_MS) {
+    console.warn("Client-side rate limit: Please wait before sending another request.");
+    return false;
+  }
+  lastPostTime = now;
+
   if (GAS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE') {
     console.error('GAS_URL is not set!');
     return false;
@@ -91,10 +101,24 @@ export async function fetchSheetData(overrideKey = null) {
   }
 }
 
+function sanitizeInput(str) {
+  if (typeof str !== 'string') return str;
+  // Prepend apostrophe if it starts with formula characters to prevent injection
+  if (/^[=+\-@]/.test(str)) {
+    return "'" + str;
+  }
+  return str;
+}
+
 export async function addEntryToSheet(entry) {
+  const sanitizedEntry = {
+    ...entry,
+    notes: sanitizeInput(entry.notes),
+  };
+  
   return postData({
     action: "ADD_ENTRY",
-    entry
+    entry: sanitizedEntry
   });
 }
 
