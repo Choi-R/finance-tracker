@@ -194,6 +194,7 @@ export default function App() {
     
     return Object.values(grouped)
       .sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date))
+      .slice(0, 10)
       .map(item => ({
          ...item,
          notes: item.notes.join(', ')

@@ -28,5 +28,13 @@ I applied a **Stale-While-Revalidate (SWR)** caching pattern with `localStorage`
 
 That's pretty much it! The code is super straightforward, literally all the heavy lifting UI is inside `App.jsx`, and `api.js` acts as a thin wrapper.
 
-Cheers,  
-*Web Dev yang lagi pusing ngatur cash flow* ✌️
+## 🧠 Software Engineering Principles Applied
+
+While this is a personal project, it strictly adheres to professional software engineering best practices to keep the codebase maintainable, fast, and bug-free:
+
+*   **YAGNI (You Ain't Gonna Need It):** The architecture avoids over-engineering. Instead of building complex server-side pagination and sync engines for a dataset that fits in <500KB of JSON, it uses a "Thick Client" approach. It fetches all data once and processes it locally, resulting in instantaneous, native-app-like performance without the complexity debt.
+*   **DRY (Don't Repeat Yourself):** Data like the `CATEGORIES` array and utility functions (`parseLocalDate`, `formatCurrency`) are defined exactly once in `utils.js` and imported wherever needed. Adding a new category requires a one-line change that automatically propagates throughout the entire UI.
+*   **Separation of Concerns (SoC):** The codebase is modularized cleanly. `api.js` handles all backend communication, `utils.js` manages pure logic/math, `index.css` controls visuals, and `App.jsx` acts purely as the state and UI orchestrator.
+*   **Single Source of Truth (SSoT):** The application state maintains only one master record of the data (`entries`). All derived views—such as period-specific lists, category totals, the recent days summary, and search results—are calculated on-the-fly using `useMemo()`. This eliminates the risk of UI inconsistencies or desynchronized totals.
+*   **KISS (Keep It Simple, Stupid):** The application completely avoids heavy, unnecessary libraries (no Redux, no React Router, no heavy UI component libraries). It relies solely on React's built-in hooks (`useState`, `useMemo`) to manage state and navigation, keeping the bundle incredibly lightweight.
+
