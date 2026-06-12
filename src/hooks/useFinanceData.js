@@ -67,7 +67,8 @@ export function useFinanceData(isAuthed, setIsAuthed) {
       'lain-lain': 0,
       'tagihan': 500000,
       'jajan-suami': 500000,
-      'jajan-istri': 500000
+      'jajan-istri': 500000,
+      'situasional': 0
     };
     return { ...defaultBudgets, ...(budgetsByPeriod[currentPeriodKey] || {}) };
   }, [budgetsByPeriod, currentPeriodKey]);
@@ -95,7 +96,7 @@ export function useFinanceData(isAuthed, setIsAuthed) {
     return defaultStats;
   }, [periodEntries, currentPeriodBudgets]);
 
-  const grandTotal = (stats['daily']?.total || 0) + (stats['lain-lain']?.total || 0) + (stats['tagihan']?.total || 0);
+  const grandTotal = (stats['daily']?.total || 0) + (stats['lain-lain']?.total || 0) + (stats['tagihan']?.total || 0) + (stats['situasional']?.total || 0);
 
   const recentDaysStats = useMemo(() => {
     const exactLast7Days = Array.from({ length: 7 }, (_, i) => format(subDays(new Date(), i), 'yyyy-MM-dd'));
@@ -105,8 +106,9 @@ export function useFinanceData(isAuthed, setIsAuthed) {
       const dailyTotal = dayEntries.filter(e => e.category === 'daily').reduce((sum, e) => sum + e.amount, 0);
       const lainTotal = dayEntries.filter(e => e.category === 'lain-lain').reduce((sum, e) => sum + e.amount, 0);
       const tagihanTotal = dayEntries.filter(e => e.category === 'tagihan').reduce((sum, e) => sum + e.amount, 0);
+      const situasionalTotal = dayEntries.filter(e => e.category === 'situasional').reduce((sum, e) => sum + e.amount, 0);
       
-      const dayEntriesFiltered = dayEntries.filter(e => ['daily', 'lain-lain', 'tagihan'].includes(e.category));
+      const dayEntriesFiltered = dayEntries.filter(e => ['daily', 'lain-lain', 'tagihan', 'situasional'].includes(e.category));
       const notes = dayEntriesFiltered.map(e => e.note).filter(Boolean).join(', ');
 
       return {
@@ -114,8 +116,9 @@ export function useFinanceData(isAuthed, setIsAuthed) {
         dailyTotal,
         lainTotal,
         tagihanTotal,
+        situasionalTotal,
         notes,
-        total: dailyTotal + lainTotal + tagihanTotal
+        total: dailyTotal + lainTotal + tagihanTotal + situasionalTotal
       };
     });
   }, [periodEntries]);

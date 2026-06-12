@@ -292,6 +292,7 @@ h1, h2, h3, h4, h5, h6 {
 .stat-card.cat-tagihan::before { background: #f87171; }
 .stat-card.cat-jajan-suami::before { background: #60a5fa; }
 .stat-card.cat-jajan-istri::before { background: #f472b6; }
+.stat-card.cat-situasional::before { background: #fbbf24; }
 .stat-card.cat-grand::before { background: linear-gradient(90deg, #10b981, #3b82f6); }
 
 /* Form Group */
@@ -369,6 +370,7 @@ h1, h2, h3, h4, h5, h6 {
 .cat-badge-tagihan { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);}
 .cat-badge-jajan-suami { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3);}
 .cat-badge-jajan-istri { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236,72,153,0.3);}
+.cat-badge-situasional { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3);}
 
 .hi-note {
   font-size: 0.95rem;

@@ -19,7 +19,7 @@ I applied a **Stale-While-Revalidate (SWR)** caching pattern with `localStorage`
 *   A heavily condensed tabular view grouping up transactions for straightforward auditing.
 *   In short, for personal use: it's fast, free, neat, and secure. Does its job perfectly.
 
-## 🏃How to Run
+## How to Run
 
 1. Clone or download this repo.
 2. Run `npm install`.

@@ -13,13 +13,16 @@ export default function HistoryList({ recentDaysStats, entries, setSelectedDate 
     
     const grouped = matched.reduce((acc, entry) => {
       if (!acc[entry.date]) {
-         acc[entry.date] = { date: entry.date, dailyTotal: 0, lainTotal: 0, tagihanTotal: 0, notes: [], total: 0 };
+         acc[entry.date] = { date: entry.date, dailyTotal: 0, lainTotal: 0, tagihanTotal: 0, situasionalTotal: 0, notes: [], total: 0 };
       }
       if (entry.category === 'daily') acc[entry.date].dailyTotal += entry.amount;
       else if (entry.category === 'lain-lain') acc[entry.date].lainTotal += entry.amount;
       else if (entry.category === 'tagihan') acc[entry.date].tagihanTotal += entry.amount;
+      else if (entry.category === 'situasional') acc[entry.date].situasionalTotal += entry.amount;
       
-      acc[entry.date].total += entry.amount;
+      if (['daily', 'lain-lain', 'tagihan', 'situasional'].includes(entry.category)) {
+        acc[entry.date].total += entry.amount;
+      }
       acc[entry.date].notes.push(entry.note);
       return acc;
     }, {});

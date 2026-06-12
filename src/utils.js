@@ -6,7 +6,8 @@ export const CATEGORIES = [
   { id: 'lain-lain', label: 'Lain-Lain', badgeClass: 'cat-badge-lain-lain', colorClass: 'cat-lain-lain' },
   { id: 'tagihan', label: 'Tagihan, Iuran', badgeClass: 'cat-badge-tagihan', colorClass: 'cat-tagihan' },
   { id: 'jajan-suami', label: 'Jajan Suami', badgeClass: 'cat-badge-jajan-suami', colorClass: 'cat-jajan-suami' },
-  { id: 'jajan-istri', label: 'Jajan Istri', badgeClass: 'cat-badge-jajan-istri', colorClass: 'cat-jajan-istri' }
+  { id: 'jajan-istri', label: 'Jajan Istri', badgeClass: 'cat-badge-jajan-istri', colorClass: 'cat-jajan-istri' },
+  { id: 'situasional', label: 'Situasional', badgeClass: 'cat-badge-situasional', colorClass: 'cat-situasional' }
 ];
 
 // Helper to reliably parse 'YYYY-MM-DD' as local time without timezone shifts
