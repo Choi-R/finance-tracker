@@ -1,7 +1,8 @@
 // Replace this with the URL you got from Google Apps Script after deploying
 const GAS_URL = import.meta.env.VITE_GAS_URL || 'YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE';
-import { format } from 'date-fns';
 import { getValidKey, clearKey } from './auth';
+import { formatISO } from './utils';
+
 
 /**
  * Helper to perform POST requests. We send payload as text/plain 
@@ -80,7 +81,7 @@ export async function fetchSheetData(overrideKey = null) {
           } else {
             const d = new Date(e.date);
             if (!isNaN(d.getTime())) {
-              normalizedDate = format(d, 'yyyy-MM-dd');
+              normalizedDate = formatISO(d);
             }
           }
         } catch (err) {

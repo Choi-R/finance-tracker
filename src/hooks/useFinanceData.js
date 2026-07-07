@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { format, subDays } from 'date-fns';
 import { fetchSheetData, addEntryToSheet, deleteEntryFromSheet, updateBudgetInSheet } from '../api';
-import { CATEGORIES, getPeriodForDate, getPeriodByKey, parseLocalDate } from '../utils';
+import { CATEGORIES, getPeriodForDate, getPeriodByKey, parseLocalDate, formatISO } from '../utils';
 
 export function useFinanceData(isAuthed, setIsAuthed) {
   const [entries, setEntries] = useState(() => {
@@ -96,19 +95,22 @@ export function useFinanceData(isAuthed, setIsAuthed) {
     return defaultStats;
   }, [periodEntries, currentPeriodBudgets]);
 
-  const grandTotal = (stats['daily']?.total || 0) + (stats['lain-lain']?.total || 0) + (stats['tagihan']?.total || 0) + (stats['situasional']?.total || 0);
+  const grandTotal = (stats['daily']?.total || 0) + (stats['lain-lain']?.total || 0) + (stats['tagihan']?.total || 0);
 
   const recentDaysStats = useMemo(() => {
-    const exactLast7Days = Array.from({ length: 7 }, (_, i) => format(subDays(new Date(), i), 'yyyy-MM-dd'));
+    const exactLast7Days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      return formatISO(d);
+    });
     
     return exactLast7Days.map(date => {
       const dayEntries = periodEntries.filter(e => e.date === date);
       const dailyTotal = dayEntries.filter(e => e.category === 'daily').reduce((sum, e) => sum + e.amount, 0);
       const lainTotal = dayEntries.filter(e => e.category === 'lain-lain').reduce((sum, e) => sum + e.amount, 0);
       const tagihanTotal = dayEntries.filter(e => e.category === 'tagihan').reduce((sum, e) => sum + e.amount, 0);
-      const situasionalTotal = dayEntries.filter(e => e.category === 'situasional').reduce((sum, e) => sum + e.amount, 0);
       
-      const dayEntriesFiltered = dayEntries.filter(e => ['daily', 'lain-lain', 'tagihan', 'situasional'].includes(e.category));
+      const dayEntriesFiltered = dayEntries.filter(e => ['daily', 'lain-lain', 'tagihan'].includes(e.category));
       const notes = dayEntriesFiltered.map(e => e.note).filter(Boolean).join(', ');
 
       return {
@@ -116,9 +118,8 @@ export function useFinanceData(isAuthed, setIsAuthed) {
         dailyTotal,
         lainTotal,
         tagihanTotal,
-        situasionalTotal,
         notes,
-        total: dailyTotal + lainTotal + tagihanTotal + situasionalTotal
+        total: dailyTotal + lainTotal + tagihanTotal
       };
     });
   }, [periodEntries]);

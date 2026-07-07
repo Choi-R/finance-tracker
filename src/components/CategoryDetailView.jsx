@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { ChevronLeft, Trash2 } from 'lucide-react';
-import { CATEGORIES, formatCurrency, parseLocalDate } from '../utils';
+import { CATEGORIES, formatCurrency, parseLocalDate, formatDayMonth } from '../utils';
 
 export default function CategoryDetailView({ 
   selectedCategory, 
@@ -92,7 +90,7 @@ export default function CategoryDetailView({
                     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                       <span className={`hi-category ${cat.badgeClass}`}>{cat.label}</span>
                       <span className="hi-date clickable-date" title="Lihat semua pengeluaran hari ini" onClick={() => setSelectedDate(entry.date)}>
-                        {format(parseLocalDate(entry.date), 'dd MMMM', { locale: id })}
+                        {formatDayMonth(parseLocalDate(entry.date))}
                       </span>
                     </div>
                     <div className="hi-note">{entry.note}</div>
@@ -112,7 +110,7 @@ export default function CategoryDetailView({
                     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                       <span className={`hi-category ${cat.badgeClass}`}>{cat.label}</span>
                       <span className="hi-date clickable-date" title="Lihat semua pengeluaran hari ini" onClick={() => setSelectedDate(group.date)}>
-                        {format(parseLocalDate(group.date), 'dd MMMM', { locale: id })}
+                        {formatDayMonth(parseLocalDate(group.date))}
                       </span>
                     </div>
                     <div className="hi-note">{group.notes.join(', ')}</div>

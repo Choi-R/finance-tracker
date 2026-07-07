@@ -1,8 +1,6 @@
 import React, { useRef } from 'react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { ChevronLeft, Trash2, Calendar } from 'lucide-react';
-import { CATEGORIES, formatCurrency, parseLocalDate } from '../utils';
+import { CATEGORIES, formatCurrency, parseLocalDate, formatLongDate, formatDayMonth, formatISO } from '../utils';
 
 export default function DateDetailView({ selectedDate, setSelectedDate, entries, deleteEntry }) {
   const detailDateRef = useRef(null);
@@ -22,7 +20,7 @@ export default function DateDetailView({ selectedDate, setSelectedDate, entries,
           Pengeluaran 
           <div style={{ position: 'relative', display: 'inline-block' }} onClick={() => detailDateRef.current?.showPicker()}>
             <div className="glass-input" style={{ width: '14rem', padding: '0.3rem 0.5rem', fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: 0, cursor: 'pointer' }}>
-              <span>{selectedDate ? format(parseLocalDate(selectedDate), 'dd MMMM yyyy', { locale: id }) : 'Pilih Tanggal'}</span>
+              <span>{selectedDate ? formatLongDate(parseLocalDate(selectedDate)) : 'Pilih Tanggal'}</span>
               <Calendar size={18} style={{ opacity: 0.7 }} />
             </div>
             <input 
@@ -31,7 +29,7 @@ export default function DateDetailView({ selectedDate, setSelectedDate, entries,
               value={selectedDate} 
               onChange={e => {
                 if (!e.target.value) {
-                  setSelectedDate(format(new Date(), 'yyyy-MM-dd'));
+                  setSelectedDate(formatISO(new Date()));
                 } else {
                   setSelectedDate(e.target.value);
                 }
@@ -72,7 +70,7 @@ export default function DateDetailView({ selectedDate, setSelectedDate, entries,
                     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                       <span className={`hi-category ${catObj.badgeClass}`}>{catObj.label}</span>
                       <span className="hi-date clickable-date" title="Per Hari" onClick={() => setSelectedDate(entry.date)}>
-                        {format(parseLocalDate(entry.date), 'dd MMMM', { locale: id })}
+                        {formatDayMonth(parseLocalDate(entry.date))}
                       </span>
                     </div>
                     <div className="hi-note">{entry.note}</div>

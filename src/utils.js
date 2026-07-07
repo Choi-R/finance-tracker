@@ -1,6 +1,3 @@
-import { startOfMonth, endOfMonth, setDate, isBefore, addMonths, subMonths, format } from 'date-fns';
-import { id } from 'date-fns/locale';
-
 export const CATEGORIES = [
   { id: 'daily', label: 'Daily', badgeClass: 'cat-badge-daily', colorClass: 'cat-daily' },
   { id: 'lain-lain', label: 'Lain-Lain', badgeClass: 'cat-badge-lain-lain', colorClass: 'cat-lain-lain' },
@@ -17,6 +14,55 @@ export const parseLocalDate = (dateStr) => {
   return new Date(y, m - 1, d);
 };
 
+const addMonths = (date, amount) => {
+  const res = new Date(date);
+  res.setMonth(res.getMonth() + amount);
+  return res;
+};
+
+const subMonths = (date, amount) => {
+  const res = new Date(date);
+  res.setMonth(res.getMonth() - amount);
+  return res;
+};
+
+const setDate = (date, day) => {
+  const res = new Date(date);
+  res.setDate(day);
+  return res;
+};
+
+export const formatISO = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+export const formatPeriodKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+};
+
+export const formatLongDate = (date) => {
+  return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+};
+
+export const formatDayMonth = (date) => {
+  return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long' }).format(date);
+};
+
+export const formatCompactDate = (date) => {
+  return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'short' }).format(date);
+};
+
+export const formatSlashDate = (dateStr) => {
+  if (!dateStr) return 'DD/MM/YYYY';
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+};
+
 // Calculate period based on the 10th of the month cutoff
 export const getPeriodForDate = (dateObj) => {
   const day = dateObj.getDate();
@@ -31,9 +77,8 @@ export const getPeriodForDate = (dateObj) => {
   return {
     start,
     end,
-    // Month name based on the baseMonth (which is the month of the 10th)
-    monthKey: `PRD-${format(baseMonth, 'yyyy-MM')}`,
-    label: `${format(start, 'dd MMMM yyyy', { locale: id })} - ${format(end, 'dd MMMM yyyy', { locale: id })}`
+    monthKey: `PRD-${formatPeriodKey(baseMonth)}`,
+    label: `${formatLongDate(start)} - ${formatLongDate(end)}`
   };
 };
 
@@ -51,7 +96,7 @@ export const getPeriodByKey = (monthKeyStr) => {
     start,
     end,
     monthKey: monthKeyStr,
-    label: `${format(start, 'dd MMMM yyyy', { locale: id })} - ${format(end, 'dd MMMM yyyy', { locale: id })}`
+    label: `${formatLongDate(start)} - ${formatLongDate(end)}`
   };
 };
 
@@ -63,3 +108,4 @@ export const formatCurrency = (amount) => {
     maximumFractionDigits: 0
   }).format(amount);
 };
+

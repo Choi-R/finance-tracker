@@ -1,7 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { parseLocalDate } from '../utils';
+import { parseLocalDate, formatCompactDate } from '../utils';
 
 export default function HistoryList({ recentDaysStats, entries, setSelectedDate }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,12 +11,11 @@ export default function HistoryList({ recentDaysStats, entries, setSelectedDate 
     
     const grouped = matched.reduce((acc, entry) => {
       if (!acc[entry.date]) {
-         acc[entry.date] = { date: entry.date, dailyTotal: 0, lainTotal: 0, tagihanTotal: 0, situasionalTotal: 0, notes: [], total: 0 };
+         acc[entry.date] = { date: entry.date, dailyTotal: 0, lainTotal: 0, tagihanTotal: 0, notes: [], total: 0 };
       }
       if (entry.category === 'daily') acc[entry.date].dailyTotal += entry.amount;
       else if (entry.category === 'lain-lain') acc[entry.date].lainTotal += entry.amount;
       else if (entry.category === 'tagihan') acc[entry.date].tagihanTotal += entry.amount;
-      else if (entry.category === 'situasional') acc[entry.date].situasionalTotal += entry.amount;
       
       if (['daily', 'lain-lain', 'tagihan', 'situasional'].includes(entry.category)) {
         acc[entry.date].total += entry.amount;
@@ -68,7 +65,7 @@ export default function HistoryList({ recentDaysStats, entries, setSelectedDate 
             alignItems: 'center' 
           }}
         >
-          <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{format(parseLocalDate(stat.date), 'dd MMM', { locale: id })}</div>
+          <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{formatCompactDate(parseLocalDate(stat.date))}</div>
           <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.dailyTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.dailyTotal)}</div>
           <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.lainTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.lainTotal)}</div>
           <div style={{ textAlign: 'right', fontSize: '0.85rem', color: stat.tagihanTotal === 0 ? 'var(--text-secondary)' : '#fff' }}>{formatCompact(stat.tagihanTotal)}</div>

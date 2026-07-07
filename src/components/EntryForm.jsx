@@ -1,11 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { format } from 'date-fns';
 import { Plus, Calendar } from 'lucide-react';
-import { CATEGORIES, parseLocalDate } from '../utils';
+import { CATEGORIES, parseLocalDate, formatISO, formatSlashDate } from '../utils';
 
 export default function EntryForm({ isSyncing, addEntry }) {
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [date, setDate] = useState(formatISO(new Date()));
   const [category, setCategory] = useState('daily');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
@@ -21,7 +19,7 @@ export default function EntryForm({ isSyncing, addEntry }) {
     }
 
     const newEntry = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       date,
       category,
       amount: Number(amount),
@@ -41,7 +39,7 @@ export default function EntryForm({ isSyncing, addEntry }) {
           <label>Tanggal</label>
           <div style={{ position: 'relative' }} onClick={() => formDateRef.current?.showPicker()}>
             <div className="glass-input" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-              <span>{date ? format(parseLocalDate(date), 'dd/MM/yyyy') : 'DD/MM/YYYY'}</span>
+              <span>{formatSlashDate(date)}</span>
               <Calendar size={18} style={{ opacity: 0.7 }} />
             </div>
             <input 

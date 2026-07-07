@@ -1,6 +1,6 @@
 import React from 'react';
-import { format, addMonths, subMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight, Settings } from 'lucide-react';
+import { formatPeriodKey } from '../utils';
 
 export default function Header({ 
   isSyncing, 
@@ -13,15 +13,15 @@ export default function Header({
   const prevPeriod = () => {
     const keyStr = currentPeriodKey.replace('PRD-', '');
     const [y, m] = keyStr.split('-').map(Number);
-    const newDate = subMonths(new Date(y, m - 1, 10), 1);
-    setCurrentPeriodKey(`PRD-${format(newDate, 'yyyy-MM')}`);
+    const newDate = new Date(y, m - 2, 10);
+    setCurrentPeriodKey(`PRD-${formatPeriodKey(newDate)}`);
   };
 
   const nextPeriod = () => {
     const keyStr = currentPeriodKey.replace('PRD-', '');
     const [y, m] = keyStr.split('-').map(Number);
-    const newDate = addMonths(new Date(y, m - 1, 10), 1);
-    setCurrentPeriodKey(`PRD-${format(newDate, 'yyyy-MM')}`);
+    const newDate = new Date(y, m, 10);
+    setCurrentPeriodKey(`PRD-${formatPeriodKey(newDate)}`);
   };
 
   return (

@@ -1,6 +1,5 @@
 import React from 'react';
-import { format } from 'date-fns';
-import { CATEGORIES, formatCurrency } from '../utils';
+import { CATEGORIES, formatCurrency, formatISO } from '../utils';
 
 export default function SummaryStats({ stats, grandTotal, setSelectedDate, setSelectedCategory }) {
   return (
@@ -8,7 +7,7 @@ export default function SummaryStats({ stats, grandTotal, setSelectedDate, setSe
       <div 
         className="glass-panel stat-card cat-grand clickable-card" 
         style={{ gridColumn: '1 / -1' }}
-        onClick={() => setSelectedDate(format(new Date(), 'yyyy-MM-dd'))}
+        onClick={() => setSelectedDate(formatISO(new Date()))}
       >
         <div className="stat-header">
           <span className="stat-title">Grand Total (Tanpa Jajan)</span>
