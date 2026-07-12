@@ -123,6 +123,22 @@ export async function addEntryToSheet(entry) {
   });
 }
 
+export async function editEntryInSheet(entry) {
+  let sanitizedNote = entry.note.replace(/<[^>]*>?/gm, '').trim();
+  if (/^[=+\-@]/.test(sanitizedNote)) {
+    sanitizedNote = "'" + sanitizedNote;
+  }
+  const sanitizedEntry = {
+    ...entry,
+    note: sanitizedNote
+  };
+  
+  return postData({
+    action: "EDIT_ENTRY",
+    entry: sanitizedEntry
+  });
+}
+
 export async function deleteEntryFromSheet(id) {
   return postData({
     action: "DELETE_ENTRY",

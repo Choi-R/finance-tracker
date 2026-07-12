@@ -421,6 +421,21 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--danger-color);
 }
 
+.hi-edit {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.hi-edit:hover {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary-color);
+}
+
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;

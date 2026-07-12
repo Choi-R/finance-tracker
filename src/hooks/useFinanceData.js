@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { fetchSheetData, addEntryToSheet, deleteEntryFromSheet, updateBudgetInSheet } from '../api';
+import { fetchSheetData, addEntryToSheet, editEntryInSheet, deleteEntryFromSheet, updateBudgetInSheet } from '../api';
 import { CATEGORIES, getPeriodForDate, getPeriodByKey, parseLocalDate, formatISO } from '../utils';
 
 export function useFinanceData(isAuthed, setIsAuthed) {
@@ -152,6 +152,20 @@ export function useFinanceData(isAuthed, setIsAuthed) {
     }
   };
 
+  const editEntry = async (updatedEntry) => {
+    const originalEntry = entries.find(e => e.id === updatedEntry.id);
+    if (!originalEntry) return;
+    // Optimistic Update
+    setEntries(prev => prev.map(e => e.id === updatedEntry.id ? updatedEntry : e));
+    setIsSyncing(true);
+    const success = await editEntryInSheet(updatedEntry);
+    if (!success) {
+      alert("Gagal memperbarui data di database! Perubahan dibatalkan.");
+      setEntries(prev => prev.map(e => e.id === updatedEntry.id ? originalEntry : e));
+    }
+    setIsSyncing(false);
+  };
+
   const updateBudget = async (catId, val) => {
     const oldBudgets = { ...budgetsByPeriod };
     // Optimistic Update
@@ -188,6 +202,7 @@ export function useFinanceData(isAuthed, setIsAuthed) {
     grandTotal,
     recentDaysStats,
     addEntry,
+    editEntry,
     deleteEntry,
     updateBudget
   };

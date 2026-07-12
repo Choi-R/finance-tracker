@@ -70,6 +70,7 @@ export default function App() {
           periodEntries={financeData.periodEntries}
           stats={financeData.stats}
           setSelectedDate={setSelectedDate}
+          editEntry={financeData.editEntry}
           deleteEntry={financeData.deleteEntry}
         />
       ) : (
